@@ -1,63 +1,64 @@
 #include <iostream>
 #include <vector>
-#include <queue>
 #include <algorithm>
+#include <queue>
 using namespace std;
 
-const int INF = 1e9+5;
+const int INF = 1e9+7;
+const int maxN = 1e5;
+int n, m;
+vector<int> parent(maxN, -1);
+vector<int> adj[maxN];
+int in[maxN];
+vector<int> dist(maxN, -INF);
 
 int main(void) {
-    int n, m;
-
     cin >> n >> m;
-
-    vector<vector<int>> adj(n);
-    vector<int> distance(n, INF);
-    vector<int> parent(n, -1);
-
-    distance[0] = 0;
 
     int a, b;
     while (m--) {
         cin >> a >> b;
-        -- a, --b;
+        --a, --b;
         adj[a].push_back(b);
+        in[b]++;
     }
 
-    priority_queue<pair<int,int>, vector<pair<int,int>>, greater<pair<int,int>>> q;
-    q.push({0, 0});
+    dist[0] = 0;
+
+    queue<int> q;
+    for (int i = 0; i < n; i++) {
+        if (in[i] == 0) {
+            q.push(i);
+        }
+    }
 
     while (!q.empty()) {
-        auto [d, v] = q.top();
+        int v = q.front();
         q.pop();
 
-        for (auto u: adj[v]) {
-            if (d - 1 < distance[u]) {
-                distance[u] = d - 1;
+        for (int u : adj[v]) {
+            if (dist[v] + 1 > dist[u]) {
+                dist[u] = dist[v] + 1;
                 parent[u] = v;
-                q.push({distance[u], u});
             }
+            in[u]--;
+            if (in[u] == 0) q.push(u);
         }
     }
 
-    if (distance[n-1] == INF) {
+    if (dist[n-1] < 0) {
         cout << "IMPOSSIBLE" << endl;
     } else {
-        vector<int> path;
-
-        for (int x = n - 1; x != -1; x = parent[x]) {
-            path.push_back(x);
+        vector<int> result;
+        result.push_back(n-1);
+        while (result.back() != 0) {
+            result.push_back(parent[result.back()]);
         }
-
-        reverse(path.begin(), path.end());
-
-        cout << path.size() << endl;
-        for (int i = 0; i < path.size(); i++) {
-            if (i > 0) cout << " ";
-            cout << path[i] + 1;
+        reverse(result.begin(), result.end());
+        cout << result.size() << endl;
+        for (int& x : result) {
+            cout << x+1 << " ";
         }
         cout << endl;
     }
-
-    return 0;
 }
