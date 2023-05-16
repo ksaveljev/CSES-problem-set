@@ -26,8 +26,8 @@ using namespace std;
 #define fast_io ios_base::sync_with_stdio(false);cin.tie(NULL)
 
 int main(void) {
-    int n, x;
-    cin >> n;
+    int n, m;
+    cin >> n >> m;
 
     vector<int> nums(n+1), pos(n+1);
     rep (i, 1, n+1) {
@@ -42,7 +42,31 @@ int main(void) {
         }
     }
 
-    cout << result << endl;
+    int a, b;
+    while (m--) {
+        cin >> a >> b;
+
+        int numa = nums[a], numb = nums[b];
+
+        set<pair<int,int>> s;
+        s.insert({numa-1, numa});
+        s.insert({numb-1, numb});
+        if (numa < n) s.insert({numa, numa+1});
+        if (numb < n) s.insert({numb, numb+1});
+
+        for (auto [a, b] : s) {
+            if (pos[b] < pos[a]) result--;
+        }
+
+        swap(nums[a], nums[b]);
+        swap(pos[numa], pos[numb]);
+
+        for (auto [a, b] : s) {
+            if (pos[b] < pos[a]) result++;
+        }
+
+        cout << result << "\n";
+    }
 
     return 0;
 }
